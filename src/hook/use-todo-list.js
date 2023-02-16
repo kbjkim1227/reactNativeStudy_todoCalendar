@@ -2,31 +2,31 @@ import dayjs from "dayjs";
 import { useState } from "react";
 
 const defaultTodoList = [
-  {
-    id: 1,
-    content: "운동하기",
-    date: dayjs(),
-    isSuccess: true,
-  },
-  {
-    id: 2,
-    content: "공부하기",
-    date: dayjs(),
-    isSuccess: false,
-  },
-  {
-    id: 3,
-    content: "RN 강의듣기",
-    date: dayjs(),
-    isSuccess: true,
-  },
+  // {
+  //   id: 1,
+  //   content: "운동하기",
+  //   date: dayjs(),
+  //   isSuccess: true,
+  // },
+  // {
+  //   id: 2,
+  //   content: "공부하기",
+  //   date: dayjs(),
+  //   isSuccess: false,
+  // },
+  // {
+  //   id: 3,
+  //   content: "RN 강의듣기",
+  //   date: dayjs(),
+  //   isSuccess: true,
+  // },
 ];
 
-export const useTodoList = () => {
+export const useTodoList = (selectedDate) => {
   const [todoList, setTodoList] = useState(defaultTodoList);
   const [input, setInput] = useState("");
 
-  const addTodo = () => {
+  const addTodo = (selectedDate) => {
     const len = todoList.length;
     const lastId = len === 0 ? 0 : todoList[len - 1].id;
     //len이 0일때와 아닐 때를 구분해주어야한다 . (아무것도 없을 때)
@@ -57,12 +57,22 @@ export const useTodoList = () => {
     });
     setTodoList(newTodoList);
   };
+
+  const resetInput = () => setInput("");
+
+  const filteredTodoList = todoList.filter((todo) => {
+    const isSameDate = dayjs(todo.date).isSame(selectedDate, "date");
+    return isSameDate;
+  });
+
   return {
     todoList,
+    filteredTodoList,
     addTodo,
     removeTodo,
     toggleTodo,
     input,
     setInput,
+    resetInput,
   };
 };

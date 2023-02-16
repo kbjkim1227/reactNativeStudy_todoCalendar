@@ -4,6 +4,12 @@ import {
   getStatusBarHeight,
 } from "react-native-iphone-x-helper";
 
+export const ItemWidth = 220;
+export const statusBarHeight = getStatusBarHeight(true);
+export const bottomSpace = getBottomSpace();
+
+//  ios 시뮬레이터 키보드 on/off cmd + shift + k
+
 export const fillEmptyColumns = (columns, start, end) => {
   const filledColumns = columns.slice(0);
 
@@ -92,7 +98,3 @@ export const getDayColor = (day) => {
   //     return "#2b2b2b";
   // }
 };
-
-export const ItemWidth = 220;
-export const statusBarHeight = getStatusBarHeight(true);
-export const bottomSpace = getBottomSpace();

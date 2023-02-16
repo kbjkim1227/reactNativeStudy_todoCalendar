@@ -15,6 +15,7 @@ const Column = ({
   onPress,
   isSelected,
   today,
+  hasTodo,
 }) => {
   //today
   return (
@@ -36,7 +37,11 @@ const Column = ({
           borderRadius: borderSize,
         }}
       >
-        <Text style={{ color, opacity }}>{text}</Text>
+        <Text
+          style={{ color, opacity, fontWeight: hasTodo ? "bold" : "normal" }}
+        >
+          {text}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -55,6 +60,7 @@ const ArrowButton = ({ iconName, onPress }) => {
 
 export default ({
   columns,
+  todoList,
   selectedDate,
   onPressLeftArrow,
   onPressHeaderDate,
@@ -109,9 +115,10 @@ export default ({
     const color = getDayColor(day);
     const isCurrentMonth = dayjs(date).isSame(selectedDate, "month");
     const onPress = () => onPressDate(date);
-    // {setSelectedDate(date)}; // 설정이 click 마다 바뀌게 한다.
-
     const isSelected = dayjs(date).isSame(selectedDate, "date");
+    const hasTodo = todoList.find((todo) =>
+      dayjs(todo.date).isSame(dayjs(date), "date")
+    );
     const today = dayjs(date).isSame(dayjs(), "date");
     return (
       <Column
@@ -121,6 +128,7 @@ export default ({
         onPress={onPress}
         isSelected={isSelected}
         today={today}
+        hasTodo={hasTodo}
       />
     );
   };

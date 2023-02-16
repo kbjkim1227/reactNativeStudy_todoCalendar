@@ -1,14 +1,30 @@
 import dayjs from "dayjs";
-import { useEffect } from "react";
-import { FlatList, StyleSheet, Text, View, Image } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Keyboard,
+  Alert,
+} from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { Ionicons } from "@expo/vector-icons";
 import { runPracticeDayjs } from "./src/practice-dayjs";
-import { getCalendarColumns, ItemWidth, statusBarHeight } from "./src/util";
+import {
+  bottomSpace,
+  getCalendarColumns,
+  ItemWidth,
+  statusBarHeight,
+} from "./src/util";
 import { useCalendar } from "./src/hook/use-calendar";
 import { useTodoList } from "./src/hook/use-todo-list";
-import Calendar from "./src/calendar";
+import Calendar from "./src/Calendar";
 import Margin from "./src/Margin";
 import AddTodoInput from "./src/AddTodoInput";
 
@@ -25,16 +41,28 @@ export default function App() {
     subtract1Month,
     add1Month,
   } = useCalendar(now);
-  const { todoList, input, setInput } = useTodoList(selectedDate);
+  const {
+    todoList,
+    filteredTodoList,
+    input,
+    setInput,
+    toggleTodo,
+    removeTodo,
+    addTodo,
+    resetInput,
+  } = useTodoList(selectedDate);
   const columns = getCalendarColumns(selectedDate);
   const onPressLeftArrow = subtract1Month;
   const onPressHeaderDate = showDatePicker;
   const onPressRightArrow = add1Month;
   const onPressDate = setSelectedDate;
 
+  const flatListRef = useRef(null);
+
   const ListHeaderComponent = () => (
     <View>
       <Calendar
+        todoList={todoList}
         columns={columns}
         selectedDate={selectedDate}
         onPressLeftArrow={onPressLeftArrow}
@@ -57,8 +85,24 @@ export default function App() {
   );
   const renderItem = ({ item: todo }) => {
     const isSuccess = todo.isSuccess;
+    const onPress = () => toggleTodo(todo.id);
+    const onLongPress = () => {
+      Alert.alert("삭제하시겠습니까?", "", [
+        {
+          style: "cancel",
+          text: "아니요",
+        },
+        {
+          text: "네",
+          onPress: () => removeTodo(todo.id),
+        },
+      ]);
+    };
+
     return (
-      <View
+      <Pressable
+        onPress={onPress}
+        onLongPress={onLongPress}
         style={{
           flexDirection: "row",
           width: ItemWidth,
@@ -67,7 +111,7 @@ export default function App() {
           paddingHorizontal: 5,
           borderBottomWidth: 0.2,
           borderColor: "#a6a6a6",
-          // backgroundColor: todo.id % 2 === 0 ? "pink" : "lightblue",
+          //  backgroundColor: todo.id % 2 === 0 ? "pink" : "lightblue",
         }}
       >
         <Text style={{ flex: 1, fontSize: 14, color: "#595959" }}>
@@ -78,8 +122,29 @@ export default function App() {
           size={17}
           color={isSuccess ? "#595959" : "#bfbfbf"}
         />
-      </View>
+      </Pressable>
     );
+  };
+
+  const scrollToEnd = () => {
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 300);
+  };
+
+  const onPressAdd = () => {
+    addTodo();
+    resetInput();
+    scrollToEnd();
+  };
+  const onSubmitEditing = () => {
+    addTodo();
+    resetInput();
+    scrollToEnd();
+  };
+
+  const onFocus = () => {
+    scrollToEnd();
   };
 
   useEffect(() => {
@@ -92,7 +157,9 @@ export default function App() {
   // }, [selectedDate]); // selectedDate가 바뀔 때마다 인지를 해달라는 useEfrect
 
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={Keyboard.dismiss}>
+      {/* Pressable = TouchableOpacity activeOpacity={1} 이다. */}
+      {/* dismiss는 영역안에서 어딜 눌러도 키보드가 내려가게? 해준다. */}
       <Image
         source={{
           uri: "https://img.freepik.com/free-photo/white-crumpled-paper-texture-for-background_1373-159.jpg?w=1060&t=st=1667524235~exp=1667524835~hmac=8a3d988d6c33a32017e280768e1aa4037b1ec8078c98fe21f0ea2ef361aebf2c",
@@ -103,28 +170,39 @@ export default function App() {
           position: "absolute",
         }}
       />
+      {/* 출처: https://reactnative.dev/docs/keyboardavoidingview */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <>
+          <FlatList
+            ref={flatListRef}
+            data={filteredTodoList}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingTop: statusBarHeight * 1.4 }}
+            ListHeaderComponent={ListHeaderComponent}
+            renderItem={renderItem}
+            showsVerticalScrollIndicator={false}
+          />
 
-      <FlatList
-        data={todoList}
-        contentContainerStyle={{ paddingTop: statusBarHeight }}
-        ListHeaderComponent={ListHeaderComponent}
-        renderItem={renderItem}
-      />
-
-      <AddTodoInput
-        value={input}
-        onChangeText={setInput}
-        placeholder={`${dayjs(selectedDate).format("MM.D")}에 추가할 투두`}
-        onPressAdd={onPressAdd}
-      />
-
+          <AddTodoInput
+            value={input}
+            onChangeText={setInput}
+            placeholder={`${dayjs(selectedDate).format("MM.D")}에 추가할 투두`}
+            onPressAdd={onPressAdd}
+            onSubmitEditing={onSubmitEditing}
+            onFocus={onFocus}
+          />
+        </>
+      </KeyboardAvoidingView>
+      <Margin height={bottomSpace} />
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
       />
-    </View>
+    </Pressable>
   );
 }
 
