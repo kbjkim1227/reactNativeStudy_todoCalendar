@@ -1,12 +1,11 @@
-import dayjs from "dayjs";
 import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import dayjs from "dayjs";
 import { SimpleLineIcons } from "@expo/vector-icons";
+
 import { getDayColor, getDayText } from "./util";
 
 const columnSize = 35;
-const borderSize = columnSize / 2;
-
 const Column = ({
   text,
   color,
@@ -14,15 +13,14 @@ const Column = ({
   disabled,
   onPress,
   isSelected,
-  today,
   hasTodo,
+  today,
 }) => {
-  //today
   return (
     <View
       style={{
         backgroundColor: today ? "#FF7878" : "transparent",
-        borderRadius: borderSize,
+        borderRadius: columnSize / 2,
       }}
     >
       <TouchableOpacity
@@ -34,7 +32,7 @@ const Column = ({
           justifyContent: "center",
           alignItems: "center",
           backgroundColor: isSelected ? "#c2c2c2" : "transparent",
-          borderRadius: borderSize,
+          borderRadius: columnSize / 2,
         }}
       >
         <Text
@@ -46,12 +44,11 @@ const Column = ({
     </View>
   );
 };
-
 const ArrowButton = ({ iconName, onPress }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={{ paddingHorizontal: 20, paddingVertica: 15 }}
+      style={{ paddingHorizontal: 20, paddingVertical: 15 }}
     >
       <SimpleLineIcons name={iconName} size={15} color="#404040" />
     </TouchableOpacity>
@@ -71,7 +68,7 @@ export default ({
     const currentDateText = dayjs(selectedDate).format("YYYY.MM.DD.");
     return (
       <View>
-        {/* <YYYY.MM.DD. > */}
+        {/* < YYYY.MM.DD. > */}
         <View
           style={{
             flexDirection: "row",
@@ -120,6 +117,7 @@ export default ({
       dayjs(todo.date).isSame(dayjs(date), "date")
     );
     const today = dayjs(date).isSame(dayjs(), "date");
+
     return (
       <Column
         text={dateText}
@@ -127,11 +125,12 @@ export default ({
         opacity={isCurrentMonth ? 1 : 0.4}
         onPress={onPress}
         isSelected={isSelected}
-        today={today}
         hasTodo={hasTodo}
+        today={today}
       />
     );
   };
+
   return (
     <FlatList
       data={columns}

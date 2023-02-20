@@ -4,6 +4,7 @@ import { useState } from "react";
 export const useCalendar = (now) => {
   const [selectedDate, setSelectedDate] = useState(now);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -16,6 +17,7 @@ export const useCalendar = (now) => {
     setSelectedDate(dayjs(date));
     hideDatePicker();
   };
+
   const subtract1Month = () => {
     const newSelectedDate = dayjs(selectedDate).subtract(1, "month");
     setSelectedDate(newSelectedDate);

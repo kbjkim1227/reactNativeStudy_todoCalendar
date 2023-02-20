@@ -1,7 +1,8 @@
 import React from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
-import { bottomSpace, ItemWidth } from "./util";
 import { AntDesign } from "@expo/vector-icons";
+
+import { bottomSpace, ITEM_WIDTH } from "./util";
 
 export default ({
   value,
@@ -14,10 +15,10 @@ export default ({
   return (
     <View
       style={{
-        width: ItemWidth,
-        alignSelf: "center",
+        width: ITEM_WIDTH,
         flexDirection: "row",
         alignItems: "center",
+        alignSelf: "center",
       }}
     >
       <TextInput
@@ -26,14 +27,11 @@ export default ({
         placeholder={placeholder}
         style={{
           flex: 1,
-          color: "#595959",
           padding: 5,
-          /** paddingBottom: 7, // 바텀만 변경할 때 이렇게 덮어씌어도 좋다.
-           * 적용하기 위해서는 전체설정 밑에 두어야한다.
-           */
+          color: "#595959",
         }}
-        onSubmitEditing={onSubmitEditing} // 키보드에서 엔터?를 눌렀을 때 적용
-        blurOnSubmit={false} //submit을 하여도 키보드가 blur 안되게
+        onSubmitEditing={onSubmitEditing}
+        blurOnSubmit={false}
         onFocus={onFocus}
       />
       <TouchableOpacity onPress={onPressAdd} style={{ padding: 5 }}>
